@@ -54,28 +54,21 @@ class PebblingAlgorithm(BaseAlgorithm):
         self._initialize()
         yield self.state
 
-        # Continue processing until satisfiability is determined or no more clauses to process.
         consistent = True
         while self.queue and consistent:
-            # Process each clause in the queue.
             self.active_clause = self.queue.pop(0)
             head = self.poslitlist[self.active_clause]
 
-            # If the head is unmarked, mark it and update dependent clauses.
             if not self.marked_literals[head]:
                 self.marked_literals[head] = True
 
-                # For each clause where this literal appears as a negative literal,
-                # decrease the count of unmarked literals.
                 for dependent_clause in self.clauselist.get(head, []):
                     self.dependant_clause = dependent_clause
                     self.numargs[dependent_clause] -= 1
 
-                    # If all literals in the body are now marked, add the clause to the queue.
                     if self.numargs[dependent_clause] == 0:
                         next_head = self.poslitlist[dependent_clause]
 
-                        # ! Inconsistency found (Constrain leads to inconsistency)
                         if next_head == -1:
                             consistent = False
                             break
