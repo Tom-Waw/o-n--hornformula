@@ -3,7 +3,7 @@ import React, { useState } from "react";
 import { Card, Collapse, Table } from "react-bootstrap";
 
 const AlgorithmStateBox: React.FC = () => {
-	const [open, setOpen] = useState(true);
+	const [open, setOpen] = useState(false);
 	const { data } = useAlgorithm();
 
 	// Function to capitalize the first letter of a string
