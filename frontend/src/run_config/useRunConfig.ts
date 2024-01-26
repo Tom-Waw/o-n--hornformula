@@ -1,5 +1,5 @@
-import { RunConfigContext } from "@/run_config/context";
 import { useContext } from "react";
+import { RunConfigContext } from "./runConfigContext";
 
 const useRunConfig = () => {
 	const context = useContext(RunConfigContext);

@@ -1,27 +1,31 @@
+import { BaseAlgorithmState } from "@/api/algorithmContext";
+import useAlgorithm from "@/api/useAlgorithm";
 import HornFormula from "@/configuration/HornFormula";
 import useRunConfig from "@/run_config/useRunConfig";
 import React, { useMemo } from "react";
 import Graph, { Edge, Node, Options } from "react-graph-vis";
 
-interface PebblingRunState {
+interface PebblingRunState extends BaseAlgorithmState {
 	active_clause: number | null;
+	dependant_clause: number | null;
 	marked_literals: boolean[];
+	numargs: number[];
+	clauselist: { [key: number]: number[] };
 }
 
-const PebblingVisualization: React.FC<PebblingRunState> = ({
-	active_clause,
-	marked_literals,
-}) => {
+const PebblingVisualization: React.FC = () => {
 	const { formula } = useRunConfig();
+	const { data } = useAlgorithm<PebblingRunState>();
 
 	// Generate graph data from the current algorithm state and formula
 	const graph = useMemo(() => {
-		return convertToGraph(formula, marked_literals, active_clause);
-	}, [formula, marked_literals, active_clause]);
+		return convertToGraph(formula, data!);
+	}, [formula, data]);
 
 	const options: Options = {
 		autoResize: true,
-		height: "90%",
+		height: "400px",
+		clickToUse: true,
 		layout: {
 			hierarchical: {
 				enabled: true,
@@ -31,20 +35,12 @@ const PebblingVisualization: React.FC<PebblingRunState> = ({
 		},
 		edges: {
 			color: "#000000",
-			// smooth: {
-			// 	enabled: true,
-			// 	type: "dynamic",
-			// 	roundness: 0.5,
-			// },
+			width: 2,
+			smooth: true,
 		},
 		physics: {
 			enabled: true,
 		},
-		// interaction: {
-		// 	dragNodes: false,
-		// 	dragView: false,
-		// 	zoomView: false,
-		// },
 	};
 
 	return (
@@ -57,8 +53,12 @@ const PebblingVisualization: React.FC<PebblingRunState> = ({
 // Convert the current state of the Pebbling Algorithm and formula to a graph format
 const convertToGraph = (
 	formula: HornFormula,
-	marked_literals: boolean[],
-	active_clause: number | null
+	{
+		marked_literals,
+		active_clause,
+		numargs,
+		dependant_clause,
+	}: PebblingRunState
 ): { nodes: Node[]; edges: Edge[] } => {
 	const active_node =
 		active_clause !== null ? formula.heads[active_clause] : null;
@@ -70,7 +70,7 @@ const convertToGraph = (
 		nodes.push({
 			id,
 			label: label || `P${id}`,
-			color: id === active_node ? "red" : color,
+			color: id === active_node ? "blue" : color,
 			font: { color: "white" },
 		});
 	};
@@ -88,13 +88,28 @@ const convertToGraph = (
 	// Add an edge to the map, combining edges with the same source and target
 	const addEdge = (source: number, target: number, clause: number) => {
 		const key = `${source}-${target}`;
-		const edge = edgeMap.get(key) || {
-			id: key,
-			from: source,
-			to: target,
-			label: "",
-		};
-		edge.label = edge.label ? `${edge.label}, ${clause}` : `${clause}`;
+		let edge = edgeMap.get(key);
+
+		// Create a new edge if one does not exist
+		if (!edge) {
+			edge = {
+				id: key,
+				from: source,
+				to: target,
+				label: `${clause}`,
+				color: "black",
+			};
+		} else {
+			edge.label += `, ${clause}`;
+		}
+
+		// Highlight edges that are active or dependent
+		if (clause === dependant_clause) {
+			edge.color = "blue";
+		} else if (numargs[clause] === 0 && edge.color === "black") {
+			edge.color = "green";
+		}
+
 		edgeMap.set(key, edge);
 	};
 

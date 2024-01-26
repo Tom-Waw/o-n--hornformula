@@ -1,13 +1,13 @@
 import HornFormula from "@/configuration/HornFormula";
 import React, { ReactNode, createContext, useState } from "react";
 
-export interface RunConfigContextData {
+export interface RunConfigType {
 	formula: HornFormula;
 	algorithm: string;
 	isWalkthrough: boolean;
 }
 
-export interface RunConfigContextState extends RunConfigContextData {
+export interface RunConfigContextType extends RunConfigType {
 	updateFormula: (updateFn: (formula: HornFormula) => void) => void;
 	setAlgorithm: (algorithm: string) => void;
 	setIsWalkthrough: (isWalkthrough: boolean) => void;
@@ -15,15 +15,11 @@ export interface RunConfigContextState extends RunConfigContextData {
 	setIsRunning: (isRunning: boolean) => void;
 }
 
-export const RunConfigContext = createContext<
-	RunConfigContextState | undefined
->(undefined);
+export const RunConfigContext = createContext<RunConfigContextType | undefined>(
+	undefined
+);
 
-interface RunConfigProviderProps {
-	children: ReactNode;
-}
-
-export const RunConfigProvider: React.FC<RunConfigProviderProps> = ({
+export const RunConfigProvider: React.FC<{ children: ReactNode }> = ({
 	children,
 }) => {
 	const [formula, setFormula] = useState(new HornFormula());

@@ -7,6 +7,11 @@ export default class HornFormula {
 		this.heads = heads;
 	}
 
+	setFormula(formula: HornFormula): void {
+		this.matrix = formula.matrix;
+		this.heads = formula.heads;
+	}
+
 	copy(): HornFormula {
 		return new HornFormula(
 			[...this.matrix.map((row) => [...row])],
@@ -172,3 +177,15 @@ export default class HornFormula {
 		};
 	}
 }
+
+export const simpleHornFormula = new HornFormula(
+	[
+		[true, false, false, false, false],
+		[false, true, false, false, false],
+		[true, true, true, false, false],
+		[false, false, true, true, false],
+		[false, true, false, false, true],
+		[false, false, false, true, true],
+	],
+	[0, 1, 2, 3, 4, -1]
+);

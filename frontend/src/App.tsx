@@ -1,10 +1,12 @@
 import useRunConfig from "@/run_config/useRunConfig";
 import { Container, Navbar } from "react-bootstrap";
-import AlgorithmConfiguration from "./configuration";
+import AlgorithmSelector from "./configuration/AlgorithmSelector";
+import FormulaEditor from "./configuration/FormulaEditor";
 import AlgorithmVisualization from "./visualization";
+import AlgorithmControl from "./visualization/algorithm_control";
 
 function App() {
-	const { isRunning } = useRunConfig();
+	const { algorithm, formula, isRunning } = useRunConfig();
 
 	return (
 		<div className="App d-flex flex-column vh-100 text-center">
@@ -15,11 +17,14 @@ function App() {
 			</Navbar>
 
 			<Container className="d-flex flex-column py-5 flex-grow-1">
-				<AlgorithmConfiguration />
+				{!isRunning ? <FormulaEditor /> : <h4>{formula.toString()}</h4>}
+				<hr className="my-4" />
+				{!isRunning ? <AlgorithmSelector /> : <h2>{algorithm}</h2>}
 				{isRunning && (
 					<>
-						<hr className="my-5" />
+						<hr className="my-4" />
 						<AlgorithmVisualization />
+						<AlgorithmControl/>
 					</>
 				)}
 			</Container>

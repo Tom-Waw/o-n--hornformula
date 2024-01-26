@@ -1,18 +1,18 @@
+import useAlgorithm from "@/api/useAlgorithm";
 import React, { useState } from "react";
 import { Card, Collapse, Table } from "react-bootstrap";
 
-interface AlgorithmState {
-	[key: string]: unknown;
-}
-
-const AlgorithmStateBox: React.FC<AlgorithmState> = (data) => {
+const AlgorithmStateBox: React.FC = () => {
 	const [open, setOpen] = useState(true);
+	const { data } = useAlgorithm();
 
 	// Function to capitalize the first letter of a string
 	const capitalize = (s: string) => s.charAt(0).toUpperCase() + s.slice(1);
 	// Function to format the value for display
 	const formatValue = (value: unknown) =>
-		Array.isArray(value) ? value.join(", ") : JSON.stringify(value);
+		Array.isArray(value)
+			? "[ " + value.join(", ") + " ]"
+			: JSON.stringify(value);
 
 	return (
 		<Card className="mt-2">
@@ -27,7 +27,7 @@ const AlgorithmStateBox: React.FC<AlgorithmState> = (data) => {
 				<Card.Body>
 					<Table striped bordered hover size="sm">
 						<tbody>
-							{Object.entries(data).map(([key, value]) => (
+							{Object.entries(data!).map(([key, value]) => (
 								<tr key={key}>
 									<th>{capitalize(key)}</th>
 									<td>{formatValue(value)}</td>

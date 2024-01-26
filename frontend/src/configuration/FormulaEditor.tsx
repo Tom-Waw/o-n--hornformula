@@ -2,6 +2,7 @@ import useRunConfig from "@/run_config/useRunConfig";
 import React, { useState } from "react";
 import { Alert, Button, Col, Container, Form, Row } from "react-bootstrap";
 import ClauseComponent from "./ClauseComponent";
+import { simpleHornFormula } from "./HornFormula";
 
 const FormulaEditor: React.FC = () => {
 	const { formula, updateFormula } = useRunConfig();
@@ -36,7 +37,13 @@ const FormulaEditor: React.FC = () => {
 						Add Clause
 					</Button>
 				</Col>
-				<Col xs="auto" className="ml-auto d-flex justify-content-end">
+				<Col xs="auto" className="d-flex justify-content-end">
+					<Button
+						className="me-2"
+						onClick={() => updateFormula((f) => f.setFormula(simpleHornFormula))}
+					>
+						Simple
+					</Button>
 					<Form.Control
 						className="me-2"
 						type="number"

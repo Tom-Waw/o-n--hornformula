@@ -1,4 +1,5 @@
-import { BaseAlgorithmState } from "@/api/useAlgorithm";
+import { BaseAlgorithmState } from "@/api/algorithmContext";
+import useAlgorithm from "@/api/useAlgorithm";
 import useRunConfig from "@/run_config/useRunConfig";
 import React from "react";
 import { Col, Row } from "react-bootstrap";
@@ -8,8 +9,10 @@ export interface MarkingRunState extends BaseAlgorithmState {
 	solved_clauses: boolean[];
 }
 
-const MarkingVisualization: React.FC<MarkingRunState> = (data) => {
+const MarkingVisualization: React.FC = () => {
 	const { formula } = useRunConfig();
+	const { data } = useAlgorithm<MarkingRunState>();
+	const { marked_literals, solved_clauses } = data!;
 
 	return (
 		<Row className="justify-content-center">
@@ -23,7 +26,7 @@ const MarkingVisualization: React.FC<MarkingRunState> = (data) => {
 					<Col xs="auto">
 						<h4
 							className={
-								data.solved_clauses[i] ? "text-decoration-line-through" : ""
+								solved_clauses[i] ? "text-decoration-line-through" : ""
 							}
 						>
 							(
@@ -35,7 +38,7 @@ const MarkingVisualization: React.FC<MarkingRunState> = (data) => {
 											{!isFirstUsed && <span> v </span>}
 											<LiteralSymbol
 												index={j}
-												isMarked={data.marked_literals[j]}
+												isMarked={marked_literals[j]}
 												isPositive={formula.heads[i] === j}
 											/>
 										</React.Fragment>

@@ -6,6 +6,7 @@ from .base_algorithm import BaseAlgorithm
 
 class PebblingState(BaseModel):
     active_clause: int | None
+    dependant_clause: int | None
     marked_literals: list[bool]
     queue: list[int]
     numargs: list[int]
@@ -35,11 +36,13 @@ class PebblingAlgorithm(BaseAlgorithm):
 
         # Run tracking variables
         self.active_clause: int | None = None
+        self.dependant_clause: int | None = None
 
     @property
     def state(self) -> PebblingState:
         return PebblingState(
             active_clause=self.active_clause,
+            dependant_clause=self.dependant_clause,
             marked_literals=self.marked_literals,
             queue=self.queue,
             numargs=self.numargs,
@@ -58,12 +61,6 @@ class PebblingAlgorithm(BaseAlgorithm):
             self.active_clause = self.queue.pop(0)
             head = self.poslitlist[self.active_clause]
 
-            # ! Inconsistency found
-            # If the head is -1, the clause is a constraint
-            if head == -1:
-                consistent = False
-                break
-
             # If the head is unmarked, mark it and update dependent clauses.
             if not self.marked_literals[head]:
                 self.marked_literals[head] = True
@@ -71,11 +68,24 @@ class PebblingAlgorithm(BaseAlgorithm):
                 # For each clause where this literal appears as a negative literal,
                 # decrease the count of unmarked literals.
                 for dependent_clause in self.clauselist.get(head, []):
+                    self.dependant_clause = dependent_clause
                     self.numargs[dependent_clause] -= 1
 
                     # If all literals in the body are now marked, add the clause to the queue.
                     if self.numargs[dependent_clause] == 0:
-                        self.queue.append(dependent_clause)
+                        next_head = self.poslitlist[dependent_clause]
+
+                        # ! Inconsistency found (Constrain leads to inconsistency)
+                        if next_head == -1:
+                            consistent = False
+                            break
+
+                        if not self.marked_literals[next_head]:
+                            self.queue.append(dependent_clause)
+
+                    yield self.state
+
+                self.dependant_clause = None
 
             yield self.state
 
