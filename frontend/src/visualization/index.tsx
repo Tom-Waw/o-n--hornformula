@@ -5,11 +5,12 @@ import { Alert } from "react-bootstrap";
 import AlgorithmStateBox from "./AlgorithmStateBox";
 import MarkingVisualization from "./marking/MarkingVisualization";
 import PebblingVisualization from "./pebbling/PebblingVisualization";
+import CallByNeedVisualization from "./call_by_need/CallByNeedVisualization";
 
 const visualizationMap: Record<string, React.FC> = {
 	"Marking Algorithm": MarkingVisualization,
 	"Pebbling Algorithm": PebblingVisualization,
-	// Add other algorithms here
+	"Call-By-Need Algorithm": CallByNeedVisualization
 };
 
 const AlgorithmVisualization: React.FC = () => {
