@@ -1,7 +1,5 @@
 import { BaseAlgorithmState } from "@/api/algorithmContext";
 import useAlgorithm from "@/api/useAlgorithm";
-import HornFormula from "@/configuration/HornFormula";
-import useRunConfig from "@/run_config/useRunConfig";
 import React, { useMemo } from "react";
 import Graph, { Edge, Node, Options } from "react-graph-vis";
 
@@ -24,13 +22,12 @@ interface CallByNeedRunState extends BaseAlgorithmState {
 
 
 const CallByNeedVisualization: React.FC = () => {
-	const { formula } = useRunConfig();
 	const { data } = useAlgorithm<CallByNeedRunState>();
 
 	// Generate graph data from the current algorithm state and formula
 	const graph = useMemo(() => {
 		return convertToGraph(data!);
-	}, [formula, data]);
+	}, [data]);
 
 	const options: Options = {
 		autoResize: true,
@@ -62,7 +59,7 @@ const CallByNeedVisualization: React.FC = () => {
 
 // Convert the current state of the Pebbling Algorithm and formula to a graph format
 const convertToGraph = (
-		graph_state: CallByNeedRunState
+		data: CallByNeedRunState
 ): { nodes: Node[]; edges: Edge[] } => {
 	// Create a node for each literal in the formula
 	const nodes: Node[] = [];
@@ -71,14 +68,14 @@ const convertToGraph = (
 	const addNode = (id: string, color: string) => {
 		nodes.push({
 			id,
-			label: id === 'true' || 'false' ? id : `P${id}`,
+			label: id === 'true' || id === 'false' ? id : `P${id}`,
 			color: color,
 			font: { color: "white" },
 		});
 	};
 
 	// Create nodes for each literal in the formula
-	Object.entries(graph_state).forEach(([id, node]) => {
+	Object.entries(data.nodes).forEach(([id, node]) => {
 		if (node.val && node.computed){
 			addNode(id, "green");
 		}
